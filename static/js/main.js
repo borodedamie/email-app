@@ -6,26 +6,41 @@ function sendEmail() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.text())
-    .then(data => {
-        console.log(data);
-        if (data === 'Email sent successfully!') {
-            var alertDiv = document.querySelector('#alert');
-            alertDiv.className = 'alert alert-success';
-            alertDiv.innerHTML = '<p>Email sent successfully!</p>';
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log(data);
+            if (data === 'Email sent successfully!') {
+                var alertDiv = document.querySelector('#alert');
+                alertDiv.className = 'alert alert-success';
+                alertDiv.innerHTML = '<p>Email sent successfully!</p>';
 
-            setTimeout(function() {
-                alertDiv.className = '';
-                alertDiv.innerHTML = '';
-            }, 5000);
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+                setTimeout(function () {
+                    alertDiv.className = '';
+                    alertDiv.innerHTML = '';
+                }, 5000);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            if (error) {
+                var alertDiv = document.querySelector('#alert');
+                alertDiv.className = 'alert alert-danger';
+                alertDiv.innerHTML = `<p>${error}</p>`;
+
+                setTimeout(function () {
+                    alertDiv.className = '';
+                    alertDiv.innerHTML = '';
+                }, 5000);
+            }
+        });
 }
 
-document.getElementById('email-form').addEventListener('submit', function(event) {
+document.getElementById('email-form').addEventListener('submit', function (event) {
     event.preventDefault();
     sendEmail();
 });

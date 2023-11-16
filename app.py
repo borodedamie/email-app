@@ -14,30 +14,35 @@ def home():
 
 @app.route("/send-email", methods=['POST'])
 def send_email():
-    smtp_provider = request.form.get('smtp_provider')
+    smtp_server = request.form.get('smtp_server')
+    smtp_port = request.form.get('smtp_port')
     sender_email = request.form.get('sender_email')
     sender_password = request.form.get('sender_password')
     subject = request.form.get('subject')
     message = request.form.get('message')
-    recipients = request.form.get('recipients').split(',')
+    recipients = request.form.get('recipients')
     file = request.files.get('attachment')
 
-    if smtp_provider == 'gmail':
-        smtp_server = 'smtp.gmail.com'
-        smtp_port = 587
-    elif smtp_provider == 'japan':
-        smtp_server = 'smtp.example.co.jp'
-        smtp_port = 587
-    else:
-        return 'Invalid smtp provider'
-    
+    print(request.form)
+
+    # Validate inputs
+    if not smtp_server or not smtp_port or not sender_email or not sender_password or not subject or not message or not recipients:
+        return 'All fields are required except for the file attachment'
+
+    recipients = recipients.split(',')
+
+    try:
+        smtp_port = int(smtp_port)
+    except ValueError:
+        return 'SMTP port must be a number'
+
     try:
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['Subject'] = subject
         msg['To'] = ', '.join(recipients)
 
-        msg.attach(MIMEText(message, 'plain'))
+        msg.attach(MIMEText(message, 'html'))
 
         if file:
             attachment = MIMEBase('application', 'octet-stream')
@@ -49,8 +54,7 @@ def send_email():
         server = smtplib.SMTP(smtp_server, smtp_port)
         server.starttls()
 
-        if smtp_provider == 'gmail' or smtp_provider == 'japan':
-            server.login(sender_email, sender_password)
+        server.login(sender_email, sender_password)
 
         server.send_message(msg)
         server.quit()
@@ -58,6 +62,7 @@ def send_email():
         return 'Email sent successfully!'
     except Exception as e:
         return f'Error sending email: {str(e)}'
+
 
 if __name__ == '__main__':
     app.run(debug=True) 
