@@ -23,12 +23,6 @@ def send_email():
     recipients = request.form.get('recipients')
     file = request.files.get('attachment')
 
-    print(request.form)
-
-    # Validate inputs
-    if not smtp_server or not smtp_port or not sender_email or not sender_password or not subject or not message or not recipients:
-        return 'All fields are required except for the file attachment'
-
     recipients = recipients.split(',')
 
     try:

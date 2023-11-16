@@ -1,7 +1,9 @@
 function sendEmail() {
     var formData = new FormData(document.getElementById('email-form'));
+    var sendButton = document.querySelector('.btn-success');
 
-    // Use Fetch API to send a POST request
+    sendButton.textContent = 'Sending Email...';
+
     fetch('/send-email', {
         method: 'POST',
         body: formData
@@ -19,6 +21,8 @@ function sendEmail() {
                 alertDiv.className = 'alert alert-success';
                 alertDiv.innerHTML = '<p>Email sent successfully!</p>';
 
+                sendButton.textContent = 'Send Email';
+
                 setTimeout(function () {
                     alertDiv.className = '';
                     alertDiv.innerHTML = '';
@@ -32,6 +36,8 @@ function sendEmail() {
                 alertDiv.className = 'alert alert-danger';
                 alertDiv.innerHTML = `<p>${error}</p>`;
 
+                sendButton.textContent = 'Send Email';
+
                 setTimeout(function () {
                     alertDiv.className = '';
                     alertDiv.innerHTML = '';
@@ -39,6 +45,7 @@ function sendEmail() {
             }
         });
 }
+
 
 document.getElementById('email-form').addEventListener('submit', function (event) {
     event.preventDefault();
